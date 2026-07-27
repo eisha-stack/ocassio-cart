@@ -1,0 +1,14 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(npm install *)",
+      "Bash(npm --version)",
+      "Bash(cmd.exe *)",
+      "PowerShell(npm *)",
+      "WebFetch(domain:mcp.swiggy.com)",
+      "Bash(curl -s -D - -o /dev/null \"http://localhost:3000/api/_debug-cookies\")",
+      "WebSearch",
+      "Bash(npm run *)"
+    ]
+  }
+}
