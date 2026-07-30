@@ -6,6 +6,8 @@ export interface CartLineItem {
   spinId: string;
   name: string;
   price: number;
+  /** Original list price before any discount — present only when higher than `price`. */
+  mrp?: number;
   quantity: number;
   imageUrl?: string;
 }
@@ -14,6 +16,8 @@ export interface CartLineItem {
 export interface CartSnapshot {
   items: CartLineItem[];
   total: number;
+  /** The delivery address this cart is associated with, if the response reported one. */
+  addressId?: string;
   availablePaymentMethods?: string[];
   /** Set when normalization couldn't confidently parse the raw response (unknown/changed schema). */
   raw?: unknown;

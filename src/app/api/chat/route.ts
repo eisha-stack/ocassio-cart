@@ -2,8 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import OpenAI from 'openai';
 import { z } from 'zod';
 import { container } from '@/lib/container';
-import { SESSION_COOKIE_NAME } from '@/mcp/instamart/oauth-cookies';
-import { getValidAccessToken } from '@/mcp/instamart/token-manager';
+import { getSessionAndAccessToken } from '@/mcp/instamart/session';
 import { logger } from '@/utils/logger';
 
 const chatRequestSchema = z.object({
@@ -22,20 +21,11 @@ const chatRequestSchema = z.object({
  * the OpenAI + MCP tool-calling loop and gates checkout behind explicit confirmation.
  */
 export async function POST(request: NextRequest) {
-  const sessionId = request.cookies.get(SESSION_COOKIE_NAME)?.value;
+  const session = await getSessionAndAccessToken(request);
 
-  if (!sessionId) {
+  if (!session) {
     return NextResponse.json(
       { error: 'Not authenticated. Visit /api/instamart/auth/login first.' },
-      { status: 401 },
-    );
-  }
-
-  const accessToken = await getValidAccessToken(sessionId);
-
-  if (!accessToken) {
-    return NextResponse.json(
-      { error: 'Instamart session expired or missing. Visit /api/instamart/auth/login again.' },
       { status: 401 },
     );
   }
@@ -55,10 +45,10 @@ export async function POST(request: NextRequest) {
 
   try {
     const response = await container.agentOrchestrator.handleMessage({
-      userId: sessionId,
+      userId: session.sessionId,
       message: parsed.data.message ?? '',
       confirmedAction: parsed.data.confirmedAction,
-      instamartAccessToken: accessToken,
+      instamartAccessToken: session.accessToken,
     });
 
     return NextResponse.json(response);

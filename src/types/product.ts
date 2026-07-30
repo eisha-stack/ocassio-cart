@@ -8,6 +8,8 @@ export interface ProductVariant {
   spinId: string;
   name: string;
   price: number;
+  /** Original list price before any discount — present only when higher than `price`. */
+  mrp?: number;
   /** e.g. "750 ml", "28 g x 3" — display-only, not used in any tool call. */
   quantityLabel?: string;
   imageUrl?: string;

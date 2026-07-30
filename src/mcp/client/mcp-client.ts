@@ -56,8 +56,39 @@ export class McpClient implements IMcpClient {
 
     return {
       success: !result.isError,
-      data: result as unknown as T,
+      data: this.extractPayload(result) as T,
     };
+  }
+
+  /**
+   * MCP wraps a tool's actual JSON result inside a content-block envelope (normally one text
+   * block holding a JSON string; occasionally structuredContent instead) rather than returning
+   * it directly. Unwrap it here so every consumer — the LLM tool-calling loop, and the
+   * cart/product normalizer in mcp/instamart/normalize.ts — sees the tool's real payload instead
+   * of the MCP transport envelope.
+   */
+  private extractPayload(result: unknown): unknown {
+    const envelope = result as { structuredContent?: unknown; content?: unknown };
+
+    if (envelope.structuredContent !== undefined) {
+      return envelope.structuredContent;
+    }
+
+    const content = Array.isArray(envelope.content) ? envelope.content : undefined;
+    const textBlock = content?.find(
+      (block): block is { type: 'text'; text: string } =>
+        !!block && typeof block === 'object' && (block as { type?: unknown }).type === 'text',
+    );
+
+    if (!textBlock) {
+      return content;
+    }
+
+    try {
+      return JSON.parse(textBlock.text);
+    } catch {
+      return textBlock.text;
+    }
   }
 
   private requireClient(): Client {

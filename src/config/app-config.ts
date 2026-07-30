@@ -9,6 +9,13 @@ export const appConfig = {
     apiKey: env.OPENAI_API_KEY,
     model: env.OPENAI_MODEL,
     baseUrl: env.OPENAI_BASE_URL,
+    fallback: env.OPENAI_FALLBACK_API_KEY
+      ? {
+          apiKey: env.OPENAI_FALLBACK_API_KEY,
+          baseUrl: env.OPENAI_FALLBACK_BASE_URL,
+          model: env.OPENAI_FALLBACK_MODEL ?? env.OPENAI_MODEL,
+        }
+      : undefined,
   },
   instamart: {
     mcpServerUrl: env.INSTAMART_MCP_SERVER_URL,

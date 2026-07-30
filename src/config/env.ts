@@ -12,6 +12,13 @@ const envSchema = z.object({
   // https://api.groq.com/openai/v1). Leave unset to use OpenAI's own API.
   OPENAI_BASE_URL: z.string().url().optional(),
 
+  // Optional second provider, tried automatically if the primary one errors (auth failure,
+  // exhausted quota, rate limit, malformed response, ...) or times out. Leave unset to disable
+  // fallback entirely.
+  OPENAI_FALLBACK_API_KEY: z.string().optional(),
+  OPENAI_FALLBACK_BASE_URL: z.string().url().optional(),
+  OPENAI_FALLBACK_MODEL: z.string().optional(),
+
   // Swiggy Instamart MCP uses OAuth 2.1 + PKCE (no static API key) — see
   // https://mcp.swiggy.com/.well-known/oauth-authorization-server
   INSTAMART_MCP_SERVER_URL: z.string().url('INSTAMART_MCP_SERVER_URL must be a valid URL'),

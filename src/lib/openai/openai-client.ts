@@ -10,3 +10,15 @@ export const openaiClient = new OpenAI({
   apiKey: appConfig.openai.apiKey,
   baseURL: appConfig.openai.baseUrl,
 });
+
+/**
+ * Second provider client, only constructed when OPENAI_FALLBACK_API_KEY is set. Used by
+ * AgentOrchestrator to retry a completion call on a different provider/model when the primary
+ * one errors — see agent-orchestrator.ts's createCompletion().
+ */
+export const fallbackOpenaiClient = appConfig.openai.fallback
+  ? new OpenAI({
+      apiKey: appConfig.openai.fallback.apiKey,
+      baseURL: appConfig.openai.fallback.baseUrl,
+    })
+  : undefined;
